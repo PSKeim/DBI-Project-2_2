@@ -11,8 +11,8 @@
 #include <iostream>
 #include <fstream>
 
-HeapDB::HeapDB(File *fileHandler){
-	dbFile = fileHandler;
+HeapDB::HeapDB(){
+	//dbFile = fileHandler;
 }
 
 HeapDB::~HeapDB(){

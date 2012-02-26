@@ -17,7 +17,7 @@ class HeapDB : public InternalDB {
 
 public:
 	
-	HeapDB(File *fileHandler);
+	HeapDB();
 	~HeapDB();
 
 	 void Load (Schema &myschema, char *loadpath);
