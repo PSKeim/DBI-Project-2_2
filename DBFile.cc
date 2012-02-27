@@ -62,7 +62,7 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 		ofstream dbFile;
 		dbFile.open(metafile.c_str(),ios::out);
-		dbFile << f_type; //In this case, writes 0. If I need it to do more metadata later, I'll mess with it.
+		dbFile << f_type << endl; //In this case, writes 0. If I need it to do more metadata later, I'll mess with it.
 		dbFile.close();
 		return 1;
 	}
@@ -79,9 +79,23 @@ int DBFile::Open (char *f_path) {
 //Loads a previously saved DBFile in. 
 	//f.Open(1,f_path);
 	//Read in what the metadata file says about the file at f_path
+	ifstream headerF;
 	
+	string header;
+	header.append(f_path);
+	header.append(".header");
 	
-	internal->Open(f_path);
+	header.open(header.c_str());
+	
+	string type;
+	getline(headerF, line);
+	
+	if(line.compare("0") == 0){
+		fileType = 0;
+		internal = new HeapDB();
+		internal -> Open(f_path);
+	}
+	
 	//For Project 2-2 this gets more complicated, as we will need to know what TYPE of file it is, so we can choose the right internalDB file implementation
 	
 	//TODO: Check the .header file for the information 
