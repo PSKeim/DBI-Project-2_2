@@ -7,29 +7,55 @@
 #include "Comparison.h"
 #include "ComparisonEngine.h"
 #include "DBFile.h"
-#include "Defs.h"
+
 #include <iostream>
 #include <fstream>
 
 HeapDB::HeapDB(){
 	//dbFile = fileHandler;
+	//File *fileHandler
 }
 
 HeapDB::~HeapDB(){
 }
 
+int HeapDB::Create (char *fpath, fType file_type, void *startup){
+	f.Open(0,fpath);
+
+	//Now to make the Metafile
+	string metafile;
+	metafile.append(fpath);
+	metafile.append(".header");
+	//Open and write out the type
+
+	ofstream dbFile;
+	dbFile.open(metafile.c_str(),ios::out);
+	dbFile << file_type; //In this case, writes 0. If I need it to do more metadata later, I'll mess with it.
+	dbFile.close();
+	return 1;
+}
+
+int HeapDB::Open (char *fpath){
+	f.Open(1,fpath);
+	return 1;
+}
+
+int HeapDB::Close(){
+	f.Close();
+	return 1;
+}
+
+void HeapDB::MoveFirst(){
+	p.EmptyItOut();
+	globalPageIndex = 0;
+	f.GetPage(&p,globalPageIndex);
+}
 
 void HeapDB::Load(Schema &myschema, char *loadpath){	
-//Loads a bunch of data in from the file at loadpath.
-//Stores it into the file.
-//Adjusts pages as necessary.
        FILE *tableFile = fopen (loadpath, "r");
 	//Code is more or less ripped from main.cc
         Record temp; //Holding variable
-	//cout << "File size now is: " << f.GetLength() << endl;
-	// read in all of the records from the text file and see if they match
-	// the CNF expression that was typed in
-	//int counter = 0; //Counter for debug. Take out of final product!
+
 	globalPageIndex = 0; //File needs a page offset to know where it is putting the page. This is it.
         while (temp.SuckNextRecord (&myschema, tableFile) == 1) {
 		/*counter++;//Debug part of loop, just making sure it works
@@ -39,7 +65,7 @@ void HeapDB::Load(Schema &myschema, char *loadpath){
 		//Right now Temp is the next record from our table file...
 		if(p.Append(&temp) == 0){ //If the append function returns a 0, the append failed (page is full)
 			//So we need to add the page to the file, and start again
-			f->AddPage(&p, globalPageIndex);
+			f.AddPage(&p, globalPageIndex);
 			globalPageIndex++;
 			p.EmptyItOut();
 			if(p.Append(&temp) == 0){
@@ -48,7 +74,7 @@ void HeapDB::Load(Schema &myschema, char *loadpath){
 		}
        }
 	//We need to add the final page to the File. 
-	f->AddPage(&p,globalPageIndex);
+	f.AddPage(&p,globalPageIndex);
 	// Done? Maybe? I dunno.*/
 	//cout << "File size after load is: " << f.GetLength() << endl;
 
@@ -61,20 +87,20 @@ void HeapDB::Add(Record &rec){
 //Wait. That doesn't make sense. We have to get the last page... and then add it? Because f.AddPage writes it out to file.
 //But if we get the last page, does it zero it out to be nothing? MUST CHECK!
 
-	int page = f->GetLength()-2;
+	int page = f.GetLength()-2;
 	cout << "Page is "<<page<<endl;
-	cout << "GetLength is " << f->GetLength() << endl;
+	cout << "GetLength is " << f.GetLength() << endl;
 	if(page < 0){ //File has nothing in it (i.e. GetLength returned 0, so page = -1)
 		p.Append(&rec); //If the file has nothing in it, neither does the page, so it's a clean append.
-		f->AddPage(&p,0); //We then add the page, and leave
+		f.AddPage(&p,0); //We then add the page, and leave
 		return;
 	}
 	cout << "Getting page " << endl;
-	f->GetPage(&p,page); //If the file does have at least one page, we get it
+	f.GetPage(&p,page); //If the file does have at least one page, we get it
 	cout << "Page got" <<endl;
 	if(p.Append(&rec) == 1){ //Now we test the append. If it goes through
 		cout << "Appended to current page" <<endl;
-		f->AddPage(&p,page); //We overwrite the file's page with the new one
+		f.AddPage(&p,page); //We overwrite the file's page with the new one
 		cout << "Page re-added" <<endl;
 		return; //And then we leave
 	}
@@ -85,7 +111,7 @@ void HeapDB::Add(Record &rec){
 	cout << "Appending to new p age" << endl;
 	page++; //Increment which page offset we're talking about
 	cout << "Adding new page to file" <<endl;
-	f->AddPage(&p, page); //Add the page, and then we out.
+	f.AddPage(&p, page); //Add the page, and then we out.
 	cout << "Added" <<endl;
 }
 
@@ -96,8 +122,8 @@ int HeapDB::GetNext(Record &fetch){
 
 	if(p.GetFirst(&fetch) == 0){ //Check to see if anything is returned by our current page p
 			globalPageIndex++; //Update page to the next one
-		if(globalPageIndex < f->GetLength()-1){ //If nothing is returned, we check to see if p is the last page
-			f->GetPage(&p,globalPageIndex);
+		if(globalPageIndex < f.GetLength()-1){ //If nothing is returned, we check to see if p is the last page
+			f.GetPage(&p,globalPageIndex);
 			p.GetFirst(&fetch);
 			return 1;
 		}

@@ -8,8 +8,9 @@
 #include "Comparison.h"
 #include "ComparisonEngine.h"
 #include "InternalDB.h"
-
-typedef enum {heap, sorted, tree} fType;
+#include "HeapDB.h"
+#include "Defs.h"
+//typedef enum {heap, sorted, tree} fType;
 
 // stub DBFile header..replace it with your own DBFile.h 
 
@@ -37,6 +38,6 @@ public:
 	Record currentRec;
 
 private:
-	InternalDB *internal; //Our pointer to the internal DB virtual class. I could make it a reference, but I don't want you to be able to define one of these without an associated file (so no default constructor)
+	InternalDB *internal; //Our pointer to the internal DB virtual class
 };
 #endif

@@ -7,14 +7,16 @@ ifdef linux
 tag = -n
 endif
 
+all: 
+
 test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o test.o
 	$(CC) -o test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o test.o -lfl -lpthread
 	
 a2test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o a2-test.o
 	$(CC) -o a2test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o a2-test.o -lfl -lpthread
 	
-a1test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o Pipe.o y.tab.o lex.yy.o a1test.o
-	$(CC) -o a1test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o Pipe.o y.tab.o lex.yy.o a1test.o -lfl
+a1test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o InternalDB.o HeapDB.o  Pipe.o y.tab.o lex.yy.o a1test.o 
+	$(CC) -o a1test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o  InternalDB.o HeapDB.o Pipe.o y.tab.o lex.yy.o a1test.o -lfl
 	
 test.o: test.cc
 	$(CC)   -c test.cc
@@ -31,7 +33,7 @@ ComparisonEngine.o: ComparisonEngine.cc
 HeapDB.o: HeapDB.cc
 	$(CC)   -c HeapDB.cc
 
-InternalDB.o: InternalDB.cc InternalDB.h
+InternalDB.o: InternalDB.cc
 	$(CC)   -c InternalDB.cc
 	
 Pipe.o: Pipe.cc
