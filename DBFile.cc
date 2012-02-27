@@ -85,7 +85,7 @@ int DBFile::Open (char *f_path) {
 	header.append(f_path);
 	header.append(".header");
 	
-	header.open(header.c_str());
+	headerF.open(header.c_str());
 	
 	string type;
 	getline(headerF, line);
