@@ -88,7 +88,7 @@ int DBFile::Open (char *f_path) {
 	headerF.open(header.c_str());
 	
 	string type;
-	getline(headerF, line);
+	getline(headerF, type);
 	
 	if(line.compare("0") == 0){
 		fileType = 0;
