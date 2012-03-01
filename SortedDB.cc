@@ -32,6 +32,10 @@ int SortedDB::Create (char *fpath, fType file_type, void *startup){
 	dbFile.open(metafile.c_str(),ios::out);
 	dbFile << file_type; //In this case, writes 0. If I need it to do more metadata later, I'll mess with it.
 	dbFile.close();
+
+	//TODO: Figure out how to get the structure from the startup.
+	//We've got a void *, which is a pointer to something, so we need to cast it as a pointer to a SortInfo struct, I think
+	SortInfo sortinfo = *((SortInfo*) startup);
 	return 1;
 }
 
@@ -46,11 +50,13 @@ int SortedDB::Close(){
 }
 
 void SortedDB::MoveFirst(){
-	return;
+	p.EmptyItOut();
+	globalPageIndex = 0;
+	f.GetPage(&p,globalPageIndex);
 }
 
 void SortedDB::Load(Schema &myschema, char *loadpath){	
-
+	//TODO: Find sort order
 	return;
 }
 

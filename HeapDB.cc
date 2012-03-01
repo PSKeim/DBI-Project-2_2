@@ -45,7 +45,6 @@ int HeapDB::Close(){
 }
 
 void HeapDB::MoveFirst(){
-	cout << "Made it into MoveFirst" << endl;
 	p.EmptyItOut();
 	globalPageIndex = 0;
 	f.GetPage(&p,globalPageIndex);

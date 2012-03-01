@@ -16,6 +16,12 @@
 	As such, it will define virtual functions for each of the DBFile methods that require specific implementations (Load, Add, GetNext)
 **/
 
+
+struct SortInfo{
+	OrderMaker *sortOrder;
+	int runLength;
+};
+
 class SortedDB : public InternalDB {
 
 
@@ -41,6 +47,7 @@ private:
 	BigQ *bigQ;
 	Pipe *in;
 	Pipe *out;
+	bool writing;
 };
 #endif
 
