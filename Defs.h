@@ -1,7 +1,6 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-
 #define MAX_ANDS 20
 #define MAX_ORS 20
 

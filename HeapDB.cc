@@ -12,8 +12,7 @@
 #include <fstream>
 
 HeapDB::HeapDB(){
-	//dbFile = fileHandler;
-	//File *fileHandler
+
 }
 
 HeapDB::~HeapDB(){
@@ -46,6 +45,7 @@ int HeapDB::Close(){
 }
 
 void HeapDB::MoveFirst(){
+	cout << "Made it into MoveFirst" << endl;
 	p.EmptyItOut();
 	globalPageIndex = 0;
 	f.GetPage(&p,globalPageIndex);
@@ -57,11 +57,12 @@ void HeapDB::Load(Schema &myschema, char *loadpath){
         Record temp; //Holding variable
 
 	globalPageIndex = 0; //File needs a page offset to know where it is putting the page. This is it.
+	int counter = 0;
         while (temp.SuckNextRecord (&myschema, tableFile) == 1) {
-		/*counter++;//Debug part of loop, just making sure it works
-		if (counter % 10000 == 0) {
+		counter++;//Debug part of loop, just making sure it works
+		if (counter % 1 == 0) {
 			cout << counter << "\n";
-		}*/
+		}
 		//Right now Temp is the next record from our table file...
 		if(p.Append(&temp) == 0){ //If the append function returns a 0, the append failed (page is full)
 			//So we need to add the page to the file, and start again
@@ -88,31 +89,31 @@ void HeapDB::Add(Record &rec){
 //But if we get the last page, does it zero it out to be nothing? MUST CHECK!
 
 	int page = f.GetLength()-2;
-	cout << "Page is "<<page<<endl;
-	cout << "GetLength is " << f.GetLength() << endl;
+	//cout << "Page is "<<page<<endl;
+	//cout << "GetLength is " << f.GetLength() << endl;
 	if(page < 0){ //File has nothing in it (i.e. GetLength returned 0, so page = -1)
 		p.Append(&rec); //If the file has nothing in it, neither does the page, so it's a clean append.
 		f.AddPage(&p,0); //We then add the page, and leave
 		return;
 	}
-	cout << "Getting page " << endl;
+	//cout << "Getting page " << endl;
 	f.GetPage(&p,page); //If the file does have at least one page, we get it
-	cout << "Page got" <<endl;
+	//cout << "Page got" <<endl;
 	if(p.Append(&rec) == 1){ //Now we test the append. If it goes through
-		cout << "Appended to current page" <<endl;
+		//cout << "Appended to current page" <<endl;
 		f.AddPage(&p,page); //We overwrite the file's page with the new one
-		cout << "Page re-added" <<endl;
+		//cout << "Page re-added" <<endl;
 		return; //And then we leave
 	}
 
 	//If the page append doesn't go through, then we have to add a new page
 	p.EmptyItOut(); //Clear the page
 	p.Append(&rec); //Add the record
-	cout << "Appending to new p age" << endl;
+	//cout << "Appending to new p age" << endl;
 	page++; //Increment which page offset we're talking about
-	cout << "Adding new page to file" <<endl;
+	//cout << "Adding new page to file" <<endl;
 	f.AddPage(&p, page); //Add the page, and then we out.
-	cout << "Added" <<endl;
+	//cout << "Added" <<endl;
 }
 
 int HeapDB::GetNext(Record &fetch){

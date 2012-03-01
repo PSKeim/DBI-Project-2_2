@@ -7,16 +7,14 @@ ifdef linux
 tag = -n
 endif
 
-all: 
-
 test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o test.o
 	$(CC) -o test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o test.o -lfl -lpthread
 	
 a2test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o a2-test.o
 	$(CC) -o a2test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o BigQ.o DBFile.o Pipe.o y.tab.o lex.yy.o a2-test.o -lfl -lpthread
 	
-a1test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o InternalDB.o HeapDB.o  Pipe.o y.tab.o lex.yy.o a1test.o 
-	$(CC) -o a1test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o  InternalDB.o HeapDB.o Pipe.o y.tab.o lex.yy.o a1test.o -lfl
+a1test.out: Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o InternalDB.o HeapDB.o SortedDB.o Pipe.o y.tab.o lex.yy.o a1test.o 
+	$(CC) -o a1test.out Record.o Comparison.o ComparisonEngine.o Schema.o File.o DBFile.o  InternalDB.o HeapDB.o  SortedDB.o Pipe.o y.tab.o lex.yy.o a1test.o -lfl
 	
 test.o: test.cc
 	$(CC)   -c test.cc
@@ -50,6 +48,9 @@ File.o: File.cc
 
 Record.o: Record.cc
 	$(CC)   -c Record.cc
+
+SortedDB.o: SortedDB.cc SortedDB.h
+	$(cc)	-c SortedDB.cc
 
 Schema.o: Schema.cc
 	$(CC)   -c Schema.cc

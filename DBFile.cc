@@ -7,6 +7,7 @@
 #include "DBFile.h"
 #include "Defs.h"
 #include "HeapDB.h"
+#include "SortedDB.h"
 #include <iostream>
 #include <fstream>
 
@@ -51,9 +52,11 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 		return 1;*/
 	}
 
-	else if(f_type == sorted){
-		f.Open(0,f_path); //Open file to the path given, if this fails, then the system is exiting anyways, so no error handling here	
-
+	else if(f_type == sorted){	
+		internal = new SortedDB();
+		return internal->Create(f_path, f_type, startup);
+/*
+		f.Open(0,f_path); //Open file to the path given, if this fails, then the system is exiting anyways, so no error handling here
 		//internal = new SortedDB();
 		//Now to make the Metafile. I should probably start adding error handling for the meta file.
 		string metafile;
@@ -64,7 +67,7 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 		dbFile.open(metafile.c_str(),ios::out);
 		dbFile << f_type << endl; //In this case, writes 0. If I need it to do more metadata later, I'll mess with it.
 		dbFile.close();
-		return 1;
+		return 1;*/
 	}
 
 	return 0;
@@ -90,7 +93,7 @@ int DBFile::Open (char *f_path) {
 	string type;
 	getline(headerF, type);
 	
-	if(line.compare("0") == 0){
+	if(type.compare("0") == 0){
 		fileType = 0;
 		internal = new HeapDB();
 		internal -> Open(f_path);

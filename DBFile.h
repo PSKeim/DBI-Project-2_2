@@ -10,6 +10,7 @@
 #include "InternalDB.h"
 #include "HeapDB.h"
 #include "Defs.h"
+#include "SortedDB.h"
 //typedef enum {heap, sorted, tree} fType;
 
 // stub DBFile header..replace it with your own DBFile.h 
