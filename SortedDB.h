@@ -38,7 +38,7 @@ private:
 	Page p;
 	int globalPageIndex;
 	Record currentRec;
-	BigQ bigQ;
+	BigQ *bigQ;
 	Pipe *in;
 	Pipe *out;
 };

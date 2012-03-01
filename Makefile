@@ -49,8 +49,8 @@ File.o: File.cc
 Record.o: Record.cc
 	$(CC)   -c Record.cc
 
-SortedDB.o: SortedDB.cc SortedDB.h
-	$(cc)	-c SortedDB.cc
+SortedDB.o: SortedDB.cc
+	$(CC)	-c SortedDB.cc
 
 Schema.o: Schema.cc
 	$(CC)   -c Schema.cc

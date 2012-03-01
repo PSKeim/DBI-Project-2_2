@@ -40,7 +40,7 @@ int SortedDB::Open (char *fpath){
 }
 
 int SortedDB::Close(){
-	f.close();
+	f.Close();
 	//TODO: Write out the sort order of the file. Not sure how to do this yet. =O<<<<
 	return 1;
 }
