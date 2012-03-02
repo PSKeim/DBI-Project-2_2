@@ -38,6 +38,9 @@ public:
 	 void MoveFirst();
 	 int GetNext(Record &fetch);
 	 int GetNext (Record &fetchme, CNF &cnf, Record &literal);
+	 void SetWriting(bool newMode);
+	 void WriteToFile();
+	 void resetBQ();
 
 private:
 	File f;
@@ -47,7 +50,8 @@ private:
 	BigQ *bigQ;
 	Pipe *in;
 	Pipe *out;
-	bool writing;
+	bool isWriting; //TRUE for "we're writing shit", FALSE for "We're reading shit"
+	SortInfo sortinfo;
 };
 #endif
 

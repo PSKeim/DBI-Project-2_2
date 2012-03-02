@@ -31,7 +31,7 @@ DBFile::DBFile () {
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 	fileType = f_type;
-
+	cout << "DBFile is being created." << endl;
 	if(f_type == heap){ //Handle for fType 0, or the Heap type. All other types (currently) result in a "Fail to create File" situation.
 		
 		internal = new HeapDB();
@@ -53,8 +53,11 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 	}
 
 	else if(f_type == sorted){	
+		cout << "Creating Sorted DB File" << endl;
 		internal = new SortedDB();
-		return internal->Create(f_path, f_type, startup);
+		internal->Create(f_path, f_type, startup);
+		cout << "Internal has finished create function" << endl;
+		return 1;
 /*
 		f.Open(0,f_path); //Open file to the path given, if this fails, then the system is exiting anyways, so no error handling here
 		//internal = new SortedDB();

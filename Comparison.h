@@ -42,6 +42,7 @@ class OrderMaker {
 
 	friend class ComparisonEngine;
 	friend class CNF;
+	friend class SortedDB;
 
 	int numAtts;
 

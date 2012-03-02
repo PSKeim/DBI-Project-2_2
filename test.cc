@@ -40,6 +40,7 @@ void test1 () {
 	DBFile dbfile;
 	cout << "\n output to dbfile : " << rel->path () << endl;
 	dbfile.Create (rel->path(), sorted, &startup);
+	cout << "DBFile is supposed to be created." << endl;
 	dbfile.Close ();
 
 	char tbl_path[100];
