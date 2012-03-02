@@ -182,17 +182,17 @@ void SortedDB::SetWriting(bool newMode){
 
 void SortedDB::WriteToFile(){
 
-	Record outRec = new Record;
+	Record readIn;
 	vector<Record *> outRecs;
 	//First part of this is shutting down the in pipe
 	in->ShutDown();
 
 	//Then, we need to remove records from the output pipe
 
-	while(out->Remove(outRec)){
+	while(out->Remove(&readIn)){
 		Record *vecRec = new Record();
-		vecRec->Copy(&temp);
-		outRecs.pushBack(vecRec);
+		vecRec->Copy(&readIn);
+		outRecs.push_back(vecRec);
 	}
 
 	//Once this has finished, we've got al lthe records that were in the output pipe. We need to merge these in our current file
