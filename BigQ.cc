@@ -170,7 +170,7 @@ void BigQ::FirstPhase(){
 			run.push_back(vecRec);
 	}
 	cout << "Run size is " << run.size() << endl;
-	cout << "I am sorting the last run." <<endl;
+	cout << "I am sorting the last run." << endl;
 	std::sort(run.begin(),run.end(), record_sorter(order));
 	cout << "I have sorted the last run." << endl;
 	

@@ -105,7 +105,8 @@ int SortedDB::Open (char *fpath){
 	}
 	
 	//So now we have a runlen, and an ordermaker set up. That lets us make our struct.
-	
+	sortinfo.runLength = runlen;
+	sortinfo.sortOrder = order;
 	return 1;
 }
 
@@ -396,6 +397,9 @@ void SortedDB::resetBQ(){
 	//Nick say delete in and out before doing new, but I'm not sure when they'd be originally set. Best to be careful and make sure I don't double free quite just yet
 	in = new Pipe(MAX_PIPE);
 	out = new Pipe(MAX_PIPE);
+	//Apparently the sortinfo.sortOrder is not going through? IMPROV TIME!
 
-	bigQ = new BigQ(*in, *out, *(sortinfo.sortOrder), sortinfo.runLength);
+	OrderMaker *o = sortinfo.sortOrder;
+	//*(sortinfo.sortOrder)
+	bigQ = new BigQ(*in, *out, *o , sortinfo.runLength);
 }
