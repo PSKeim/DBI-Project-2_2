@@ -44,7 +44,7 @@ int SortedDB::Create (char *fpath, fType file_type, void *startup){
 	**/
 
 	//Open and write out the type
-	cout << "Writing out to meta file" << endl;
+	//cout << "Writing out to meta file" << endl;
 	
 	ofstream dbFile;
 	dbFile.open(metafile.c_str(),ios::out);
@@ -64,6 +64,7 @@ int SortedDB::Create (char *fpath, fType file_type, void *startup){
 }
 
 int SortedDB::Open (char *fpath){
+	filePath = string(fpath);
 	//We open the file itself
 	f.Open(1,fpath);
 	globalPageIndex = 0;
@@ -152,8 +153,8 @@ void SortedDB::Add(Record &rec){
 }	
 
 int SortedDB::GetNext(Record &fetch){
-	
 	SetWriting(false);
+	cout << "In Get Next for test case." << endl;
 	if(p.GetFirst(&fetch) == 0){ //Check to see if anything is returned by our current page p
 			globalPageIndex++; //Update page to the next one
 		if(globalPageIndex < f.GetLength()-1){ //If nothing is returned, we check to see if p is the last page
@@ -161,10 +162,9 @@ int SortedDB::GetNext(Record &fetch){
 			p.GetFirst(&fetch);
 			return 1;
 		}
-
+		cout << "Nothing in the file!" << endl;
 		return 0;//No records left
 	}
-
 	return 1; 
 }
 
@@ -180,7 +180,7 @@ void SortedDB::SetWriting(bool newMode){
 	if(isWriting == newMode) return; //If the mode isn't changing, then we don't care
 	//So, we're switching either from READING to WRITING, or vice versa.
 	//if isWriting is true now, then we're writing. So we'll be switching to Reading
-	cout << "Setting the writing mode to " << newMode << endl;
+	//cout << "Setting the writing mode to " << newMode << endl;
 	if(isWriting){
 		//Switching to Reading phase
 		//This writes everything out to the file, and GTFO's
@@ -199,7 +199,8 @@ void SortedDB::WriteToFile(){
 
 	in->ShutDown();
 
-	cout << "Have shut down in. In WriteToFile." << endl;
+	//cout << "Have shut down in. In WriteToFile." << endl;
+	//cout << "File path is: "<< filePath << endl;
 	//The idea here is that we have a bunch of records in the output pipe. We need to merge these in with our file.
 	//This has two cases: 1) The file is empty, 2) The file is not empty
 
@@ -213,7 +214,7 @@ void SortedDB::WriteToFile(){
 		cout << "File is empty." << endl;
 
 		while(out->Remove(&readIn)){
-			cout << "Removing shit from the out pipe." << endl;
+			//cout << "Removing shit from the out pipe." << endl;
 			if(0 == holderP.Append(&readIn)){
 				f.AddPage(&holderP, globalPageIndex);
 				globalPageIndex++;
@@ -221,7 +222,7 @@ void SortedDB::WriteToFile(){
 				holderP.Append(&readIn);
 			}
 		}
-		cout << "Have finished removing shit from the out pipe." << endl;
+		//cout << "Have finished removing shit from the out pipe." << endl;
 		f.AddPage(&holderP, globalPageIndex);
 		globalPageIndex++;
 	}
@@ -235,6 +236,7 @@ void SortedDB::WriteToFile(){
 		bool pipeIsSmaller;
 		//In this idea, we read from the output pipe and the file record by record, and write them out to a temp file
 		File tempF;
+
 		tempF.Open(0,"temptemptemp.bin");
 		int tempIndex = 0;
 		ComparisonEngine cmp;
@@ -325,71 +327,8 @@ void SortedDB::WriteToFile(){
 			}
 		}
 
-	
-	}
-
-	/*Record readIn;
-	vector<Record *> outRecs; //Records from the output pipe
-	vector<Record *> pageRecs; //Records from the pages
-	vector<Record *> mergedRecs; //Holding vector for the merged page/pipe records
-	//First part of this is shutting down the in pipe
-	in->ShutDown();
-	Page holderP; //This will be a holder page as we read in records from file
-
-
-
-	//Then, we need to remove records from the output pipe
-
-	while(out->Remove(&readIn)){
-		Record *vecRec = new Record();
-		vecRec->Copy(&readIn);
-		outRecs.push_back(vecRec);
-	}
-
-	//Once this has finished, we've got all the records that were in the output pipe. We need to merge these in our current file.
-
-	if(f.GetLength() <= 0){ //If the file is empty, then it's easy: We take all the records in the output pipe, then put them page by page into the file
-		globalPageIndex = 0;
-		for(int i = 0; i < outRecs.size(); i++){
-			if(0 == holderP.Append(outRecs[i])){
-				//HolderP is now full, we need to write it out to file
-				f.AddPage(&holderP, globalPageIndex);
-				globalPageIndex++;
-				holderP.EmptyItOut();
-				holderP.Append(outRecs[i]);
-			}
-		}
-		f.AddPage(&holderP, globalPageIndex);
-		globalPageIndex++;
-	}
-	else{ //The file wasn't empty! That means we have to deal with a bunch of bullshit! HOR-FUCKING-RAY!
-	
-//	Ways to think about how to do this:
-//	1) Nick pulled all the records into a single vector, which would probably work for the tiny ones, but is a stupid way of doing it unless you've got lots of ram
-//	2) Create a temporary file, store the results in the temp file, then switch the results over to the main file. I'll try this idea.
-	
-		File temp;
-		temp.Open(0,"temptemptemp");
-		int tempIndex = 0;
-		//Now what to do? Go page by page through our current file, and try to merge the results as best we can into the temp file
-		globalPageIndex = 0;
-		int maxLen = f.GetLength()-1;
-
-		while(globalPageIndex < maxLen){
-			f.GetPage(&holderP, globalPageIndex);
-			//Now to take all the records in that page, and merge them with the output records
-			while(holderP.GetFirst(&readIn)){
-				Record *vecRec = new Record();
-				vecRec->Copy(&readIn);
-				pageRecs.push_back(vecRec);
-			}
-			mergedRecs.reserve(pageRecs.size() + outRecs.size());
-			globalPageIndex++;
-		}
-	
-
-	}
-*/
+		tempF.Close();
+	} //End initial if/else statement
 }
 
 void SortedDB::resetBQ(){

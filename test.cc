@@ -149,10 +149,10 @@ void test4 (){
 	cout << " input from file : " << tbl_path << endl;
 
 	int success = dbfile.Open(rel->path());
+	cout << "Starting load from file." << endl;
 	dbfile.Load(*(rel->schema()), tbl_path);
-
+	cout << "Ended load from file." << endl;
 	Record rec;
-
 	while (dbfile.GetNext(rec)){
 	rec.Print(rel->schema());
 	}

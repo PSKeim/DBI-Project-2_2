@@ -60,11 +60,11 @@ void* BigQ::WorkThread(void *args){
 	BigQ *self = static_cast<BigQ*>(args);
 
 	//Now that all the sorted runs are set up, we can do the initial sort
-	cout << "BigQ is now entering First Phase." << endl;
+	//cout << "BigQ is now entering First Phase." << endl;
 	self->FirstPhase();
-	cout << "BigQ has exited First Phase." <<endl;
+	//cout << "BigQ has exited First Phase." <<endl;
 	//This has all the records writen out to a file.
-	cout<< "BigQ is now entering Second Phase." <<endl;
+	//cout<< "BigQ is now entering Second Phase." <<endl;
 	/*if(offsets.size() == 1){
 		cout << "Only one run. Outputting to pipe." << endl;
 		SecondPhase();
@@ -74,7 +74,7 @@ void* BigQ::WorkThread(void *args){
 		SecondPhasev2();
 	}*/
 	self->SecondPhasev2();
-	cout << "BigQ has exited Second Phase." <<endl;
+	//cout << "BigQ has exited Second Phase." <<endl;
 
 	// finally shut down the out pipe
 	self->output->ShutDown();
@@ -161,7 +161,7 @@ void BigQ::FirstPhase(){
 		}
 		
 	}
-	cout << "have exited first phase while loop in BiGQ" << endl;
+	//cout << "have exited first phase while loop in BiGQ" << endl;
 	//So, at this point, we have read all the records from the pipe. We have a page containing at least one record. SO:
 	while(p.GetFirst(&temp))
 	{
@@ -169,10 +169,10 @@ void BigQ::FirstPhase(){
 			vecRec->Copy(&temp);
 			run.push_back(vecRec);
 	}
-	cout << "Run size is " << run.size() << endl;
-	cout << "I am sorting the last run." << endl;
+	//cout << "Run size is " << run.size() << endl;
+	//cout << "I am sorting the last run." << endl;
 	std::sort(run.begin(),run.end(), record_sorter(order));
-	cout << "I have sorted the last run." << endl;
+	//cout << "I have sorted the last run." << endl;
 	
 	for(n = 0; n < run.size(); n++){
 		//cout << "N is: " << n << endl;
@@ -194,7 +194,7 @@ void BigQ::FirstPhase(){
 	offset++;
 	p.EmptyItOut();//Empty out the page, since we're about to add a new record to it.
 	run.clear();
-	cout << " I wrote "<<offset <<" pages to file. " <<endl;
+	//cout << " I wrote "<<offset <<" pages to file. " <<endl;
 	//f.Close();
 	//So at the end of this, f is our link to an opened file with all our runs in it. Now we need to enter phase 2
 }
@@ -267,7 +267,7 @@ void BigQ::SecondPhasev2(){
 		skip.push_back(0);
 	}
 
-	cout << "Second phase is done initializing. Entering the while loop." << endl;
+	//cout << "Second phase is done initializing. Entering the while loop." << endl;
 	int mindex;
 	ComparisonEngine cmp;
 	int outputCounter =0;
@@ -303,21 +303,21 @@ void BigQ::SecondPhasev2(){
 		if(!pageArray[mindex]->GetFirst(recs[mindex])){ //No record was found
 			
 			totOffset = offsets[mindex]+offUpdate[mindex];
-			cout << "Total offset was "<<totOffset<<endl;
-			cout << "F length is " << f.GetLength() << endl;
-			cout << "Offsets mindex is " << offsets[mindex+1] << endl;
+			//cout << "Total offset was "<<totOffset<<endl;
+			//cout << "F length is " << f.GetLength() << endl;
+			//cout << "Offsets mindex is " << offsets[mindex+1] << endl;
 			if((totOffset < f.GetLength()-1) 
 				&& ((totOffset) < offsets[mindex+1]))
 			{
-				cout << "Updating page for run " << mindex << endl;
-				cout << "Getting page at " << totOffset << endl;
+			//	cout << "Updating page for run " << mindex << endl;
+			//	cout << "Getting page at " << totOffset << endl;
 				f.GetPage(pageArray[mindex], offsets[mindex]+offUpdate[mindex]);
-				cout << "Going from offset " << totOffset << " to offset " << totOffset+1 << endl;
+			//	cout << "Going from offset " << totOffset << " to offset " << totOffset+1 << endl;
 				offUpdate[mindex]++;
 				pageArray[mindex]->GetFirst(recs[mindex]);
 			}
 			else{
-				cout << "Exhausted run " << mindex << "." << endl;
+			//	cout << "Exhausted run " << mindex << "." << endl;
 				
 			 	skip[mindex] = -1; //We've exhausted this run
 			}
