@@ -105,6 +105,7 @@ void BigQ::FirstPhase(){
 	int records = 1;
 
 	while(input->Remove(&readin) == 1){ //We have read a record in from the pipe
+		//cout << "First phase has removed record "<<records <<" from the input pipe." << endl;
 		//We now attempt to append the record to the page
 		if(p.Append(&readin) == 0)
 		{ //If the append fails, we must remove the records from the page, and put them into the vector.
@@ -160,7 +161,7 @@ void BigQ::FirstPhase(){
 		}
 		
 	}
-	
+	cout << "have exited first phase while loop in BiGQ" << endl;
 	//So, at this point, we have read all the records from the pipe. We have a page containing at least one record. SO:
 	while(p.GetFirst(&temp))
 	{
@@ -168,10 +169,10 @@ void BigQ::FirstPhase(){
 			vecRec->Copy(&temp);
 			run.push_back(vecRec);
 	}
-	//cout << "I am sorting the last run." <<endl;
+	cout << "Run size is " << run.size() << endl;
+	cout << "I am sorting the last run." <<endl;
 	std::sort(run.begin(),run.end(), record_sorter(order));
-	//cout << "I have sorted the last run." << endl;
-	//cout << "Run size is " << run.size() << endl;
+	cout << "I have sorted the last run." << endl;
 	
 	for(n = 0; n < run.size(); n++){
 		//cout << "N is: " << n << endl;

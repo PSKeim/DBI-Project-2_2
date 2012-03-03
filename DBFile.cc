@@ -31,7 +31,7 @@ DBFile::DBFile () {
 int DBFile::Create (char *f_path, fType f_type, void *startup) {
 
 	fileType = f_type;
-	cout << "DBFile is being created." << endl;
+	//cout << "DBFile is being created." << endl;
 	if(f_type == heap){ //Handle for fType 0, or the Heap type. All other types (currently) result in a "Fail to create File" situation.
 		
 		internal = new HeapDB();
@@ -53,10 +53,10 @@ int DBFile::Create (char *f_path, fType f_type, void *startup) {
 	}
 
 	else if(f_type == sorted){	
-		cout << "Creating Sorted DB File" << endl;
+		//cout << "Creating Sorted DB File" << endl;
 		internal = new SortedDB();
 		internal->Create(f_path, f_type, startup);
-		cout << "Internal has finished create function" << endl;
+		//cout << "Internal has finished create function" << endl;
 		return 1;
 /*
 		f.Open(0,f_path); //Open file to the path given, if this fails, then the system is exiting anyways, so no error handling here
@@ -101,6 +101,11 @@ int DBFile::Open (char *f_path) {
 		internal = new HeapDB();
 		internal -> Open(f_path);
 	}
+	else if(type.compare("1") == 0){
+		fileType = 1;
+		internal = new SortedDB();
+		internal -> Open(f_path);
+	}
 	
 	//For Project 2-2 this gets more complicated, as we will need to know what TYPE of file it is, so we can choose the right internalDB file implementation
 	
@@ -119,9 +124,10 @@ void DBFile::Load (Schema &f_schema, char *loadpath) {
 //Loads a bunch of data in from the file at loadpath.
 //Stores it into the file.
 //Adjusts pages as necessary.
-	if(fileType == 0){
-		internal->Load(f_schema, loadpath);
-	}
+
+	internal->Load(f_schema, loadpath);
+
+
 	/*FILE *tableFile = fopen (loadpath, "r");
 	//Code is more or less ripped from main.cc
         Record temp; //Holding variable
@@ -181,40 +187,8 @@ int DBFile::Close () {
 @param &rec The record to be added
 */
 void DBFile::Add (Record &rec) {
-//Okay, to Add, we must make sure that p = last page of the file.
-//And then do shit to it. Namely, SCIENCE.
-//Science is good.
-//Wait. That doesn't make sense. We have to get the last page... and then add it? Because f.AddPage writes it out to file.
-//But if we get the last page, does it zero it out to be nothing? MUST CHECK!
-	if(fileType == 0){
-		internal->Add(rec);
-	}/*
-	int page = f.GetLength()-2;
-	cout << "Page is "<<page<<endl;
-	cout << "GetLength is " << f.GetLength() << endl;
-	if(page < 0){ //File has nothing in it (i.e. GetLength returned 0, so page = -1)
-		p.Append(&rec); //If the file has nothing in it, neither does the page, so it's a clean append.
-		f.AddPage(&p,0); //We then add the page, and leave
-		return;
-	}
-	cout << "Getting page " << endl;
-	f.GetPage(&p,page); //If the file does have at least one page, we get it
-	cout << "Page got" <<endl;
-	if(p.Append(&rec) == 1){ //Now we test the append. If it goes through
-		cout << "Appended to current page" <<endl;
-		f.AddPage(&p,page); //We overwrite the file's page with the new one
-		cout << "Page re-added" <<endl;
-		return; //And then we leave
-	}
-
-	//If the page append doesn't go through, then we have to add a new page
-	p.EmptyItOut(); //Clear the page
-	p.Append(&rec); //Add the record
-	cout << "Appending to new p age" << endl;
-	page++; //Increment which page offset we're talking about
-	cout << "Adding new page to file" <<endl;
-	f.AddPage(&p, page); //Add the page, and then we out.
-	cout << "Added" <<endl;*/
+	//Simple, now we just dump this into our internal DB file to deal with.
+	internal->Add(rec);
 }
 
 /**
@@ -223,23 +197,8 @@ void DBFile::Add (Record &rec) {
 @return 0 on failure, 1 on success
 */
 int DBFile::GetNext (Record &fetchme) {
-	//The first thing to do is fetch through the current page.
-	//If the page returns 0, then we need to load the next page and get from there
-	//If the GPI > f's size, then we've reached the end of the records
+
 	return internal->GetNext(fetchme);
-	/*
-	if(p.GetFirst(&fetchme) == 0){ //Check to see if anything is returned by our current page p
-			globalPageIndex++; //Update page to the next one
-		if(globalPageIndex < f.GetLength()-1){ //If nothing is returned, we check to see if p is the last page
-			f.GetPage(&p,globalPageIndex);
-			p.GetFirst(&fetchme);
-			return 1;
-		}
-
-		return 0;//No records left
-	}
-
-	return 1; */
 }
 
 /**

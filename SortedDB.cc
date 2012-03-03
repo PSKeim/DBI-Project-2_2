@@ -125,15 +125,28 @@ void SortedDB::Load(Schema &myschema, char *loadpath){
 	//By the time we've gotten here, we should have sort order, which means load should be somewhat easy.
 	
 	SetWriting(true); //We be writing shit to file, yo.
-	//After reading spec, this needs to be replaced with a "flip" function that does the work based on what the boolean is going into it.
-	//For now, writing = true will work
 		
 	FILE *file = fopen(loadpath, "r");
+
+	Record sucker;
+
+	while(sucker.SuckNextRecord(&myschema, file)){
+		Record *temp = new Record();
+		temp->Copy(&sucker);
+		in->Insert(temp);
+	}
+
+	fclose(file);
 	
 	return;
 }
 
 void SortedDB::Add(Record &rec){
+
+	SetWriting(true); //Again, writing stuff to file.
+	
+	in->Insert(&rec);
+		
 	return;
 }	
 
@@ -163,10 +176,10 @@ int SortedDB::GetNext(Record &fetchme, CNF &cnf, Record &literal){
 This function is the one that handles the change from writing to reading. Right now, all it does is reverse the writing boolean. will update more
 */
 void SortedDB::SetWriting(bool newMode){
-
 	if(isWriting == newMode) return; //If the mode isn't changing, then we don't care
 	//So, we're switching either from READING to WRITING, or vice versa.
 	//if isWriting is true now, then we're writing. So we'll be switching to Reading
+	cout << "Setting the writing mode to " << newMode << endl;
 	if(isWriting){
 		//Switching to Reading phase
 		//This writes everything out to the file, and GTFO's
@@ -185,7 +198,7 @@ void SortedDB::WriteToFile(){
 
 	in->ShutDown();
 
-
+	cout << "Have shut down in. In WriteToFile." << endl;
 	//The idea here is that we have a bunch of records in the output pipe. We need to merge these in with our file.
 	//This has two cases: 1) The file is empty, 2) The file is not empty
 
@@ -194,9 +207,12 @@ void SortedDB::WriteToFile(){
 	Page holderP;
 	Page tempWriteoutP;
 	//If the file is empty, we have an easy case. We just remove the records from the pipe, and page them in as necessary.
+//	cout << "Checking that the file is empty" << endl;
 	if(f.GetLength() <= 0){
+		cout << "File is empty." << endl;
 
 		while(out->Remove(&readIn)){
+			cout << "Removing shit from the out pipe." << endl;
 			if(0 == holderP.Append(&readIn)){
 				f.AddPage(&holderP, globalPageIndex);
 				globalPageIndex++;
@@ -204,10 +220,12 @@ void SortedDB::WriteToFile(){
 				holderP.Append(&readIn);
 			}
 		}
+		cout << "Have finished removing shit from the out pipe." << endl;
 		f.AddPage(&holderP, globalPageIndex);
 		globalPageIndex++;
 	}
 	else{
+		cout << "File is not empty." << endl;
 		//Assuming the file is not empty, we have to decide what the best way to do it is
 		//Time for stupid ideas!
 		globalPageIndex = 0;
@@ -374,7 +392,7 @@ void SortedDB::WriteToFile(){
 }
 
 void SortedDB::resetBQ(){
-
+	cout << "Revving up BigQ." << endl;
 	//Nick say delete in and out before doing new, but I'm not sure when they'd be originally set. Best to be careful and make sure I don't double free quite just yet
 	in = new Pipe(MAX_PIPE);
 	out = new Pipe(MAX_PIPE);

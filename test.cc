@@ -122,20 +122,60 @@ void test3 () {
 
 }
 
+/**
+Personal test case to make sure my merge is working
+**/
+void test4 (){
+
+	OrderMaker o;
+	rel->get_sort_order (o); //Don't know what this does, I just copied it from test 1. X_x;;
+
+	int runlen = 0;
+	while (runlen < 1) {
+		cout << "\t\n specify runlength:\n\t ";
+		cin >> runlen;
+	}
+	struct {OrderMaker *o; int l;} startup = {&o, runlen};
+	
+	
+	
+	DBFile dbfile;
+	cout << "\n output to dbfile : " << rel->path () << endl;
+	dbfile.Create (rel->path(), sorted, &startup);
+
+
+	char tbl_path[100];
+	sprintf (tbl_path, "%s%s.tbl", tpch_dir, rel->name());
+	cout << " input from file : " << tbl_path << endl;
+
+	int success = dbfile.Open(rel->path());
+	dbfile.Load(*(rel->schema()), tbl_path);
+
+	Record rec;
+
+	while (dbfile.GetNext(rec)){
+	rec.Print(rel->schema());
+	}
+
+	dbfile.Close ();
+
+}
+
 int main (int argc, char *argv[]) {
 
 	setup ();
 
 	relation *rel_ptr[] = {n, r, c, p, ps, s, o, li};
-	void (*test_ptr[]) () = {&test1, &test2, &test3};  
+	void (*test_ptr[]) () = {&test1, &test2, &test3, &test4};  
 	void (*test) ();
 
 	int tindx = 0;
-	while (tindx < 1 || tindx > 3) {
+	while (tindx < 1 || tindx > 4) {
 		cout << " select test option: \n";
 		cout << " \t 1. create sorted dbfile\n";
 		cout << " \t 2. scan a dbfile\n";
-		cout << " \t 3. run some query \n \t ";
+		cout << " \t 3. run some query \n";
+		cout << " \t 4. Run test 4" << endl;
 		cin >> tindx;
 	}
 
