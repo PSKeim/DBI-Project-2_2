@@ -152,6 +152,8 @@ void test4 (){
 	cout << "Starting load from file." << endl;
 	dbfile.Load(*(rel->schema()), tbl_path);
 	cout << "Ended load from file." << endl;
+	dbfile.MoveFirst();
+	cout << "Did dbfile move out." << endl;
 	Record rec;
 	while (dbfile.GetNext(rec)){
 	rec.Print(rel->schema());

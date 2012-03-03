@@ -154,7 +154,7 @@ void SortedDB::Add(Record &rec){
 
 int SortedDB::GetNext(Record &fetch){
 	SetWriting(false);
-	cout << "In Get Next for test case." << endl;
+	//cout << "In Get Next for test case." << endl;
 	if(p.GetFirst(&fetch) == 0){ //Check to see if anything is returned by our current page p
 			globalPageIndex++; //Update page to the next one
 		if(globalPageIndex < f.GetLength()-1){ //If nothing is returned, we check to see if p is the last page
@@ -162,7 +162,7 @@ int SortedDB::GetNext(Record &fetch){
 			p.GetFirst(&fetch);
 			return 1;
 		}
-		cout << "Nothing in the file!" << endl;
+		cout << "Nothing left in the file!" << endl;
 		return 0;//No records left
 	}
 	return 1; 
@@ -224,6 +224,7 @@ void SortedDB::WriteToFile(){
 		}
 		//cout << "Have finished removing shit from the out pipe." << endl;
 		f.AddPage(&holderP, globalPageIndex);
+		cout << "File added page at index" << globalPageIndex << endl;
 		globalPageIndex++;
 	}
 	else{
