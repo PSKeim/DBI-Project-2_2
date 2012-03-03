@@ -18,14 +18,6 @@ struct record_sorter {
 			return true;
 		return false;
 	}
-	/*bool operator() (Record rec1, Record rec2)
-	{
-		ComparisonEngine cmp;
-		 if(cmp.Compare(&rec1, &rec2, &sorter) < 0) //Strict, so we only want to know if rec1 is LESS THAN rec2
-			return true;
-		return false;
-	}*/
-	
 };
 BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen):order(sortorder)
 {

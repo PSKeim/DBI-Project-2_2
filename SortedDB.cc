@@ -13,7 +13,7 @@
 #include <fstream>
 
 
-#define MAX_PIPE 100
+#define MAX_PIPE 1000
 
 SortedDB::SortedDB(){
 
@@ -25,9 +25,9 @@ SortedDB::~SortedDB(){
 
 int SortedDB::Create (char *fpath, fType file_type, void *startup){
 	f.Open(0,fpath);
-
+	globalPageIndex  = 0;
 	sortinfo = *((SortInfo*) startup);
-
+	filePath = string(fpath);
 	//Now to make the Metafile
 	string metafile;
 	metafile.append(fpath);
@@ -66,6 +66,7 @@ int SortedDB::Create (char *fpath, fType file_type, void *startup){
 int SortedDB::Open (char *fpath){
 	//We open the file itself
 	f.Open(1,fpath);
+	globalPageIndex = 0;
 	//Now to get all sorts of useful information. Like the sort order and all.
 	string metafile;
 	metafile.append(fpath);
@@ -170,7 +171,7 @@ void SortedDB::SetWriting(bool newMode){
 		//Switching to Reading phase
 		//This writes everything out to the file, and GTFO's
 		isWriting = false;
-		//WriteToFile();
+		WriteToFile();
 	}
 	else{
 		//If isWriting isn't true, then we're READING, so we need to switch to Writing
@@ -182,10 +183,141 @@ void SortedDB::SetWriting(bool newMode){
 
 void SortedDB::WriteToFile(){
 
-	Record readIn;
-	vector<Record *> outRecs;
+	in->ShutDown();
+
+
+	//The idea here is that we have a bunch of records in the output pipe. We need to merge these in with our file.
+	//This has two cases: 1) The file is empty, 2) The file is not empty
+
+	Record readIn; //Read in from pipe
+	Record pageIn; //Read in from page
+	Page holderP;
+	Page tempWriteoutP;
+	//If the file is empty, we have an easy case. We just remove the records from the pipe, and page them in as necessary.
+	if(f.GetLength() <= 0){
+
+		while(out->Remove(&readIn)){
+			if(0 == holderP.Append(&readIn)){
+				f.AddPage(&holderP, globalPageIndex);
+				globalPageIndex++;
+				holderP.EmptyItOut();
+				holderP.Append(&readIn);
+			}
+		}
+		f.AddPage(&holderP, globalPageIndex);
+		globalPageIndex++;
+	}
+	else{
+		//Assuming the file is not empty, we have to decide what the best way to do it is
+		//Time for stupid ideas!
+		globalPageIndex = 0;
+		bool stuffInPipe = true; //Lets us know if the pipe is empty
+		bool stuffInFile = true; //Lets us know when the file is empty (true because file length is > 0)
+		bool pipeIsSmaller;
+		//In this idea, we read from the output pipe and the file record by record, and write them out to a temp file
+		File tempF;
+		tempF.Open(0,"temptemptemp.bin");
+		int tempIndex = 0;
+		ComparisonEngine cmp;
+		stuffInPipe = out->Remove(&readIn);
+		
+		f.GetPage(&holderP, globalPageIndex);
+		globalPageIndex++;
+		holderP.GetFirst(&pageIn);
+
+		//At this point, we have the first record in the pipe, and the first record in the first page of the file
+		//What to do now? We need to compare the two. We have our comparison engine, cmp.
+		//We want to know which one is strictly smaller, let's do our comparison
+		while(stuffInPipe || stuffInFile){
+			//As we enter this the first time, we have something from the pipe and something from the file
+			//Later on, though, the pipe or file might be empty.
+			//How to handle this?
+
+			if(!stuffInPipe){
+				//We are out of items from the pipe. That means merge is finished, and we need to pump out the rest of the items from
+				//the actual file to the temp file.
+				do{
+					if(0 == tempWriteoutP.Append(&readIn)){
+						tempF.AddPage(&tempWriteoutP, tempIndex);
+						tempIndex++;
+				 		tempWriteoutP.Append(&readIn);
+					}
+					
+					if(0 == holderP.GetFirst(&pageIn) && globalPageIndex < f.GetLength()){
+						f.GetPage(&holderP, globalPageIndex);
+						globalPageIndex++;
+						holderP.GetFirst(&pageIn);
+					}
+
+				}while(globalPageIndex < f.GetLength());				
+			
+			
+			}
+			else if(!stuffInFile){
+				//amazingly, we ran out of file stuff before we ran out of pipe stuff. So. Huh.
+				//So now we just loop over the pipe until it is empty, packaging it as we go...
+				
+				//We should only reach this if the last record eaten was the file record (otherwise the abvoe one will trigger)
+				//So:
+				do{
+					if(0 == tempWriteoutP.Append(&readIn)){
+					tempF.AddPage(&tempWriteoutP, tempIndex);
+					tempIndex++;
+					tempWriteoutP.Append(&readIn);
+					}
+				}while(out->Remove(&readIn));
+
+				stuffInPipe = false;
+				
+			}
+
+			if(cmp.Compare(&readIn, &pageIn, sortinfo.sortOrder) < 0)
+			{
+				pipeIsSmaller = true;
+			}
+			else pipeIsSmaller = false;
+	
+			//If We find which one is smaller, append it to the page, load a new record from the required location, and move on
+			if(pipeIsSmaller){ 
+				if(0 == tempWriteoutP.Append(&readIn)){
+					tempF.AddPage(&tempWriteoutP, tempIndex);
+					tempIndex++;
+					tempWriteoutP.Append(&readIn);
+				}
+				stuffInPipe = out->Remove(&readIn);
+			}
+			else{
+				if(0 == tempWriteoutP.Append(&pageIn)){
+					tempF.AddPage(&tempWriteoutP, tempIndex);
+					tempIndex++;
+					tempWriteoutP.Append(&pageIn);
+				}
+
+				if(0 == holderP.GetFirst(&pageIn)){ //If we run out items in this page of the pipe, we need to get a new page!
+					if(globalPageIndex >= f.GetLength()){
+							stuffInFile = false;
+					}
+					else{
+						f.GetPage(&holderP, globalPageIndex);
+						globalPageIndex++;
+						holderP.GetFirst(&pageIn);
+					}
+				}
+			}
+		}
+
+	
+	}
+
+	/*Record readIn;
+	vector<Record *> outRecs; //Records from the output pipe
+	vector<Record *> pageRecs; //Records from the pages
+	vector<Record *> mergedRecs; //Holding vector for the merged page/pipe records
 	//First part of this is shutting down the in pipe
 	in->ShutDown();
+	Page holderP; //This will be a holder page as we read in records from file
+
+
 
 	//Then, we need to remove records from the output pipe
 
@@ -195,8 +327,50 @@ void SortedDB::WriteToFile(){
 		outRecs.push_back(vecRec);
 	}
 
-	//Once this has finished, we've got al lthe records that were in the output pipe. We need to merge these in our current file
+	//Once this has finished, we've got all the records that were in the output pipe. We need to merge these in our current file.
 
+	if(f.GetLength() <= 0){ //If the file is empty, then it's easy: We take all the records in the output pipe, then put them page by page into the file
+		globalPageIndex = 0;
+		for(int i = 0; i < outRecs.size(); i++){
+			if(0 == holderP.Append(outRecs[i])){
+				//HolderP is now full, we need to write it out to file
+				f.AddPage(&holderP, globalPageIndex);
+				globalPageIndex++;
+				holderP.EmptyItOut();
+				holderP.Append(outRecs[i]);
+			}
+		}
+		f.AddPage(&holderP, globalPageIndex);
+		globalPageIndex++;
+	}
+	else{ //The file wasn't empty! That means we have to deal with a bunch of bullshit! HOR-FUCKING-RAY!
+	
+//	Ways to think about how to do this:
+//	1) Nick pulled all the records into a single vector, which would probably work for the tiny ones, but is a stupid way of doing it unless you've got lots of ram
+//	2) Create a temporary file, store the results in the temp file, then switch the results over to the main file. I'll try this idea.
+	
+		File temp;
+		temp.Open(0,"temptemptemp");
+		int tempIndex = 0;
+		//Now what to do? Go page by page through our current file, and try to merge the results as best we can into the temp file
+		globalPageIndex = 0;
+		int maxLen = f.GetLength()-1;
+
+		while(globalPageIndex < maxLen){
+			f.GetPage(&holderP, globalPageIndex);
+			//Now to take all the records in that page, and merge them with the output records
+			while(holderP.GetFirst(&readIn)){
+				Record *vecRec = new Record();
+				vecRec->Copy(&readIn);
+				pageRecs.push_back(vecRec);
+			}
+			mergedRecs.reserve(pageRecs.size() + outRecs.size());
+			globalPageIndex++;
+		}
+	
+
+	}
+*/
 }
 
 void SortedDB::resetBQ(){
