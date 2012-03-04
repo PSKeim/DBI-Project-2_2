@@ -175,6 +175,10 @@ int SortedDB::GetNext(Record &fetch){
 
 int SortedDB::GetNext(Record &fetchme, CNF &cnf, Record &literal){
 	SetWriting(false);
+	/*
+
+
+	*/
 	return 1;
 }
 
