@@ -95,7 +95,7 @@ int DBFile::Open (char *f_path) {
 	
 	string type;
 	getline(headerF, type);
-	
+	headerF.close();
 	if(type.compare("0") == 0){
 		fileType = 0;
 		internal = new HeapDB();

@@ -45,6 +45,7 @@ int SortedDB::Create (char *fpath, fType file_type, void *startup){
 
 	//Open and write out the type
 	//cout << "Writing out to meta file" << endl;
+	//sortinfo.sortOrder->Print(); // Prints out the OM's status, use for debugging
 	
 	ofstream dbFile;
 	dbFile.open(metafile.c_str(),ios::out);
@@ -52,6 +53,7 @@ int SortedDB::Create (char *fpath, fType file_type, void *startup){
 	dbFile << sortinfo.runLength << endl;
 
 	int numAttributes = sortinfo.sortOrder->numAtts;
+	dbFile << numAttributes << endl;
 	for(int i = 0; i < numAttributes; i++){
 		dbFile << sortinfo.sortOrder->whichAtts[i] << endl;
 		dbFile << sortinfo.sortOrder->whichTypes[i] << endl;
@@ -86,10 +88,13 @@ int SortedDB::Open (char *fpath){
 	File structure is defined in the Create function
 	*/
 	getline(metaFile, info); //First line will be file type, which we can ignore
+	cout << "First read produced: " << info << endl;
 	getline(metaFile, info); //This line is run length, which we actually want to use
+	cout << "Second read produced: " << info << endl;
 	runlen = atoi(info.c_str()); //Now we know the run length and can set it into our struct later
 	
 	getline(metaFile, info);
+	cout << "Third read produced: " << info << endl;
 	numAttributes = atoi(info.c_str());
 	order->numAtts = numAttributes;
 	//Now we need to loop over the file and make sure we've got the sort attributes read in to the order maker
@@ -333,12 +338,13 @@ void SortedDB::WriteToFile(){
 }
 
 void SortedDB::resetBQ(){
-	cout << "Revving up BigQ." << endl;
+	//cout << "Revving up BigQ." << endl;
 	//Nick say delete in and out before doing new, but I'm not sure when they'd be originally set. Best to be careful and make sure I don't double free quite just yet
 	in = new Pipe(MAX_PIPE);
 	out = new Pipe(MAX_PIPE);
 	//Apparently the sortinfo.sortOrder is not going through? IMPROV TIME!
 
+	cout << "The number of attributes in the sortOrder is " << sortinfo.sortOrder->numAtts << endl;
 	OrderMaker *o = sortinfo.sortOrder;
 	//*(sortinfo.sortOrder)
 	bigQ = new BigQ(*in, *out, *o , sortinfo.runLength);
