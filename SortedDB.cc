@@ -191,6 +191,8 @@ void SortedDB::SetWriting(bool newMode){
 		//This writes everything out to the file, and GTFO's
 		isWriting = false;
 		WriteToFile();
+		MoveFirst(); //Basically, I'm saying that if you want to read after adding/loading, you start from the beginning.
+		//Will change this if someone advises me not to do it that way
 	}
 	else{
 		//If isWriting isn't true, then we're READING, so we need to switch to Writing
@@ -205,7 +207,7 @@ void SortedDB::WriteToFile(){
 	in->ShutDown();
 
 	//cout << "Have shut down in. In WriteToFile." << endl;
-	//cout << "File path is: "<< filePath << endl;
+	cout << "File path is: "<< filePath << endl;
 	//The idea here is that we have a bunch of records in the output pipe. We need to merge these in with our file.
 	//This has two cases: 1) The file is empty, 2) The file is not empty
 
@@ -216,7 +218,7 @@ void SortedDB::WriteToFile(){
 	//If the file is empty, we have an easy case. We just remove the records from the pipe, and page them in as necessary.
 //	cout << "Checking that the file is empty" << endl;
 	if(f.GetLength() <= 0){
-		cout << "File is empty." << endl;
+		//cout << "File is empty." << endl;
 
 		while(out->Remove(&readIn)){
 			//cout << "Removing shit from the out pipe." << endl;
@@ -229,7 +231,7 @@ void SortedDB::WriteToFile(){
 		}
 		//cout << "Have finished removing shit from the out pipe." << endl;
 		f.AddPage(&holderP, globalPageIndex);
-		cout << "File added page at index" << globalPageIndex << endl;
+		//cout << "File added page at index" << globalPageIndex << endl;
 		globalPageIndex++;
 	}
 	else{
@@ -334,6 +336,7 @@ void SortedDB::WriteToFile(){
 		}
 
 		tempF.Close();
+		rename("temptemptemp.bin", filePath.c_str());
 	} //End initial if/else statement
 }
 
