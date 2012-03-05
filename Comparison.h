@@ -99,6 +99,9 @@ public:
         // a relational selection over a single relation so only one schema is used
         void GrowFromParseTree (struct AndList *parseTree, Schema *mySchema, 
 		Record &literal);
+		
+		//Function that creates the query order maker for GNCNF
+		void CreateQueryOrderMaker(OrderMaker &original, OrderMaker &query);
 
 };
 

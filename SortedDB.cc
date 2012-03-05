@@ -89,13 +89,13 @@ int SortedDB::Open (char *fpath){
 	File structure is defined in the Create function
 	*/
 	getline(metaFile, info); //First line will be file type, which we can ignore
-	cout << "First read produced: " << info << endl;
+	//cout << "First read produced: " << info << endl;
 	getline(metaFile, info); //This line is run length, which we actually want to use
-	cout << "Second read produced: " << info << endl;
+	//cout << "Second read produced: " << info << endl;
 	runlen = atoi(info.c_str()); //Now we know the run length and can set it into our struct later
 	
 	getline(metaFile, info);
-	cout << "Third read produced: " << info << endl;
+	//cout << "Third read produced: " << info << endl;
 	numAttributes = atoi(info.c_str());
 	order->numAtts = numAttributes;
 	//Now we need to loop over the file and make sure we've got the sort attributes read in to the order maker
@@ -175,13 +175,54 @@ int SortedDB::GetNext(Record &fetch){
 }
 
 int SortedDB::GetNext(Record &fetchme, CNF &cnf, Record &literal){
-	SetWriting(false);
-	/*
-
+	SetWriting(false, true); //The one query where we WANT To tell SetWriting that it's a CNF
+	//This is because if we run multiple GNCNF queries, we don't want to have to re-do all the work
+	//Because, you know, it's a lot of work and stuff.
+	
+	//Need to tell if money is null or not, because we delete it on any call that's not GNCNF
+	
+	ComparisonEngine comp;
+	
+	int ret = GetNext(fetchme);
+	
+	if(ret == 0){ 
+		return 0; //Nothing in the file, so nothing to do here!
+	}	
+	while(!comp.Compare (&fetchme, &literal, &cnf)){
+		ret = GetNext(fetchme);
 		
-
-	*/
+		if(ret == 0){ 
+			return 0; //Nothing in the file, so nothing to do here!
+		}	
+		/*if(p.GetFirst(&fetchme) == 0){
+		 globalPageIndex++; //Update page to the next one
+		 if(globalPageIndex < f.GetLength()-1){ //If nothing is returned, we check to see if p is the last page
+		 f.GetPage(&p,globalPageIndex);
+		 p.GetFirst(&fetchme);
+		 }
+		 
+		 return 0;//No records left
+		 }*/
+	}
+	
 	return 1;
+	
+	/*	
+	Record *possMatch = new Record;
+
+	if(money == NULL){ //Okay, we only want to do this building IF MONEY IS NULL
+		money = new OrderMaker;
+	}
+	
+	//Fuck the work, let's go straight to getting next. I don't understand shit about where to start
+	//on constructing the order maker
+	
+	p.GetFirst(&possMatch);
+	
+
+	return 1;
+	
+	*/
 }
 
 /*
@@ -189,7 +230,12 @@ This function is the one that handles the change from writing to reading. Right 
  
  This is a minor change
 */
-void SortedDB::SetWriting(bool newMode){
+void SortedDB::SetWriting(bool newMode, bool isCNF){
+	
+	if(!isCNF && money != NULL){
+		delete money; //This deletes the object money points to?
+		money = NULL;
+	}
 	if(isWriting == newMode) return; //If the mode isn't changing, then we don't care
 	//So, we're switching either from READING to WRITING, or vice versa.
 	//if isWriting is true now, then we're writing. So we'll be switching to Reading
@@ -349,6 +395,9 @@ void SortedDB::WriteToFile(){
 }
 
 void SortedDB::resetBQ(){
+	
+	delete in;
+	delete out;
 	//cout << "Revving up BigQ." << endl;
 	//Nick say delete in and out before doing new, but I'm not sure when they'd be originally set. Best to be careful and make sure I don't double free quite just yet
 	in = new Pipe(MAX_PIPE);

@@ -38,7 +38,7 @@ public:
 	 void MoveFirst();
 	 int GetNext(Record &fetch);
 	 int GetNext (Record &fetchme, CNF &cnf, Record &literal);
-	 void SetWriting(bool newMode);
+	 void SetWriting(bool newMode, bool isCNF = false);
 	 void WriteToFile();
 	 void resetBQ();
 
@@ -53,6 +53,7 @@ private:
 	bool isWriting; //TRUE for "we're writing shit", FALSE for "We're reading shit"
 	SortInfo sortinfo;
 	string filePath;
+	OrderMaker *money;
 };
 #endif
 

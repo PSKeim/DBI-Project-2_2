@@ -613,4 +613,46 @@ void CNF :: GrowFromParseTree (struct AndList *parseTree, Schema *mySchema,
 	remove("hkljdfgkSDFSDF");
 }
 
+void CNF::CreateQueryOrderMaker(OrderMaker &original, OrderMaker &query){
+	
+	bool inOriginal = false;
+	original.Print();
+	int addAttr;
+	int index = 0;
+	for(int i = 0; i < numAnds; i++){ //Iterate over the ands in the CNF
+			//we add an attribute to query if:
+			//1) It is in the CNF instance
+			//2) It is the only attribute in the sub expression
+			//3) The CNF instance is comparing that attribute with a literal value with an equality check
+			//WTF does that last one mean? God I don't know.
+		
+		for(int j = 0; j < orLens[i]; j++){
+			if(orList[i][j].op != Equals){
+				continue;
+			}
+			else if ((orList[i][j].operand1 == Literal && orList[i][j].operand2 != Literal) ||
+					 (orList[i][j].operand1 != Literal && orList[i][j].operand2 == Literal)){
+				continue;
+			}
+			
+			
+			//Find out what attribute this specific And/Or is working on
+			if(orList[i][j].operand1 == Literal){
+				addAttr = orList[i][j].whichAtt2;
+			}
+			else{
+				addAttr = orList[i][j].whichAtt1;
+			}
+			
+			for(int z = 0; z < original.numAtts; z++){
+					
+			}
+			
 
+		}
+		
+	}
+
+	
+	query.Print();
+}
