@@ -236,6 +236,7 @@ void SortedDB::SetWriting(bool newMode, bool isCNF){
 		delete money; //This deletes the object money points to?
 		money = NULL;
 	}
+	
 	if(isWriting == newMode) return; //If the mode isn't changing, then we don't care
 	//So, we're switching either from READING to WRITING, or vice versa.
 	//if isWriting is true now, then we're writing. So we'll be switching to Reading
