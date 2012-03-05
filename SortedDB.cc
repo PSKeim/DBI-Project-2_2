@@ -175,6 +175,7 @@ int SortedDB::GetNext(Record &fetch){
 }
 
 int SortedDB::GetNext(Record &fetchme, CNF &cnf, Record &literal){
+	cout << "In GetNext CNF for test." << endl;
 	SetWriting(false, true); //The one query where we WANT To tell SetWriting that it's a CNF
 	//This is because if we run multiple GNCNF queries, we don't want to have to re-do all the work
 	//Because, you know, it's a lot of work and stuff.
@@ -184,14 +185,16 @@ int SortedDB::GetNext(Record &fetchme, CNF &cnf, Record &literal){
 	ComparisonEngine comp;
 	
 	int ret = GetNext(fetchme);
-	
+	cout << "Got past the initial ret" << endl;
 	if(ret == 0){ 
 		return 0; //Nothing in the file, so nothing to do here!
 	}	
 	while(!comp.Compare (&fetchme, &literal, &cnf)){
+		cout << "Comparing records!" << endl;
 		ret = GetNext(fetchme);
 		
 		if(ret == 0){ 
+			cout << "Nothing found, time to leave. " << endl;
 			return 0; //Nothing in the file, so nothing to do here!
 		}	
 		/*if(p.GetFirst(&fetchme) == 0){
