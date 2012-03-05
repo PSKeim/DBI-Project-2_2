@@ -16,8 +16,8 @@
 
 #define MAX_PIPE 1000
 
-SortedDB::SortedDB(){
-
+SortedDB::SortedDB(): money(NULL){
+	//money = NULL;
 }
 
 SortedDB::~SortedDB(){

@@ -53,7 +53,7 @@ private:
 	bool isWriting; //TRUE for "we're writing shit", FALSE for "We're reading shit"
 	SortInfo sortinfo;
 	string filePath;
-	OrderMaker *money = NULL;
+	OrderMaker *money;
 };
 #endif
 
