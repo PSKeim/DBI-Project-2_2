@@ -1,3 +1,4 @@
+
 #include "SortedDB.h"
 
 #include "TwoWayList.h"
@@ -185,6 +186,8 @@ int SortedDB::GetNext(Record &fetchme, CNF &cnf, Record &literal){
 
 /*
 This function is the one that handles the change from writing to reading. Right now, all it does is reverse the writing boolean. will update more
+ 
+ This is a minor change
 */
 void SortedDB::SetWriting(bool newMode){
 	if(isWriting == newMode) return; //If the mode isn't changing, then we don't care
