@@ -615,10 +615,12 @@ void CNF :: GrowFromParseTree (struct AndList *parseTree, Schema *mySchema,
 
 void CNF::CreateQueryOrderMaker(OrderMaker &original, OrderMaker &query){
 	
-	bool inOriginal = false;
 	original.Print();
 	int addAttr;
 	int index = 0;
+	bool match = false;
+	int totalMatched = 0;
+	
 	for(int i = 0; i < numAnds; i++){ //Iterate over the ands in the CNF
 			//we add an attribute to query if:
 			//1) It is in the CNF instance
@@ -644,14 +646,25 @@ void CNF::CreateQueryOrderMaker(OrderMaker &original, OrderMaker &query){
 				addAttr = orList[i][j].whichAtt1;
 			}
 			
-			for(int z = 0; z < original.numAtts; z++){
-					
+			if(addAttr = original.whichAtts[index]){
+				match = true;
+				
+				query.numAtts++;
+				query.whichAtts[index] = addAttr;
+				
+				index++;
+				totalMatched++;
+				break; //Oooooh, we're breaking out of the city!
 			}
-			
 
+		} //End of For J
+		
+		if(match){
+			if(totalMatched < original.numAtts) i = -1; //Reset the loop because there might be another attribute we can match with
+			match = false;
 		}
 		
-	}
+	} // End of For I
 
 	
 	query.Print();
