@@ -266,6 +266,7 @@ void SortedDB::SetWriting(bool newMode, bool isCNF){
 
 void SortedDB::WriteToFile(){
 	cout << "In the WriteTo File function" << endl;
+	MoveFirst(); //have to start at the beginning. derp.
 	/**
 	 Temporary solution so it 'works' until I have more time to fix it. Fuck being sick and driving home.
 	 Thanks Morgan.
