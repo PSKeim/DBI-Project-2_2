@@ -297,6 +297,8 @@ void SortedDB::WriteToFile(){
 	f.AddPage(&tempP, tempIndex);
 	tempIndex++;
 	
+	MoveFirst();
+	
 	return;
 	
 /*
