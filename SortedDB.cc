@@ -334,7 +334,7 @@ void SortedDB::WriteToFile(){
 				 		tempWriteoutP.Append(&readIn);
 					}
 					
-					if(0 == holderP.GetFirst(&pageIn) && globalPageIndex < f.GetLength()){
+					if(0 == holderP.GetFirst(&pageIn) && globalPageIndex < f.GetLength()-1){
 						f.GetPage(&holderP, globalPageIndex);
 						globalPageIndex++;
 						holderP.GetFirst(&pageIn);
@@ -385,7 +385,7 @@ void SortedDB::WriteToFile(){
 				}
 
 				if(0 == holderP.GetFirst(&pageIn)){ //If we run out items in this page of the pipe, we need to get a new page!
-					if(globalPageIndex >= f.GetLength()){
+					if(globalPageIndex >= f.GetLength()-1){
 							stuffInFile = false;
 					}
 					else{
