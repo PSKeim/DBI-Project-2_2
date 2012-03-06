@@ -271,8 +271,8 @@ void SortedDB::WriteToFile(){
 	 Thanks Morgan.
 	 **/
 	Record temp;
-	MoveFirst(); //Gotta start at the beginning.
-	if (0 != f.GetLength()) {
+	//MoveFirst(); //Gotta start at the beginning.
+	if (f.GetLength() > 0) {
 		cout << "File's length was 0... why am I in here for this test??? " << endl;
 		while (GetNext(temp))
         {
@@ -281,7 +281,7 @@ void SortedDB::WriteToFile(){
     }//At the end of this, all the records that were in the file are now in the in pipe
 
 	in->ShutDown();
-	
+	cout << "Input pipe has shut down." << endl;
 	f.Close();
 	f.Open(0,(char *)filePath.c_str());
 	int tempIndex = 0;
