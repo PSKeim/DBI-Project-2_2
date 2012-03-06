@@ -294,6 +294,8 @@ void SortedDB::WriteToFile(){
 			tempP.Append(&temp);
 		}
 	}//Ended pulling records out of pipe
+	f.AddPage(&tempP, tempIndex);
+	tempIndex++;
 	
 	return;
 	
