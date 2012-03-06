@@ -128,7 +128,9 @@ void SortedDB::MoveFirst(){
 	p.EmptyItOut();
 	cout << "Global page index now set to 0" << endl;
 	globalPageIndex = 0;
-	f.GetPage(&p,globalPageIndex);
+	if(f.GetLength > 0){
+		f.GetPage(&p,globalPageIndex);
+	}
 }
 
 void SortedDB::Load(Schema &myschema, char *loadpath){	
