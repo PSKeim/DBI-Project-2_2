@@ -284,7 +284,7 @@ void SortedDB::WriteToFile(){
 	in->ShutDown();
 	
 	f.Close();
-	f.Open(0,filePath.c_str);
+	f.Open(0,filePath.c_str());
 	int tempIndex = 0;
 	Page tempP;
 	while(out->Remove(&temp)){
