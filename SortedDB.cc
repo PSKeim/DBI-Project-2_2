@@ -271,15 +271,16 @@ void SortedDB::WriteToFile(){
 	 Thanks Morgan.
 	 **/
 	Record temp;
+	int pFF = 0;
 	//MoveFirst(); //Gotta start at the beginning.
 	if (f.GetLength() > 0) {
-		cout << "File's length was 0... why am I in here for this test??? " << endl;
 		while (GetNext(temp))
         {
 			in->Insert(&temp);
+			pFF++;
         }
     }//At the end of this, all the records that were in the file are now in the in pipe
-
+	cout << "Pulled " << pFF << " records from file int othe pipe" << endl;
 	in->ShutDown();
 	cout << "Input pipe has shut down." << endl;
 	f.Close();
