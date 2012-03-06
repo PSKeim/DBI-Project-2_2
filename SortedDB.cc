@@ -284,13 +284,13 @@ void SortedDB::WriteToFile(){
 	in->ShutDown();
 	
 	f.Close();
-	f.Open(0,filePath.c_str());
-	globalPageIndex = 0;
+	f.Open(0,filePath);
+	int tempIndex = 0;
 	Page tempP;
 	while(out->Remove(&temp)){
 		if(0 == tempP.Append(&temp)){ //If the append fails
-			f.AddPage(&temp, globalPageIndex);
-			globalPageIndex++;
+			f.AddPage(&temp, tempIndex);
+			tempIndex++;
 			tempP.EmptyItOut();
 			tempP.Append(&temp);
 		}
