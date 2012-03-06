@@ -265,9 +265,40 @@ void SortedDB::SetWriting(bool newMode, bool isCNF){
 }
 
 void SortedDB::WriteToFile(){
+	
+	/**
+	 Temporary solution so it 'works' until I have more time to fix it. Fuck being sick and driving home.
+	 Thanks Morgan.
+	 **/
+	Record temp;
+	MoveFirst(); //Gotta start at the beginning.
+	
+	if (0 != f.GetLength()) // file was new, so don't bother merging, just write from pipe to file.
+    {
+		while (GetNext(temp))
+        {
+			in->Insert(&temp);
+        }
+    }//At the end of this, all the records that were in the file are now in the in pipe
 
 	in->ShutDown();
-
+	
+	f.Close();
+	f.Open(0,filePath.c_str());
+	globalPageIndex = 0;
+	Page tempP;
+	while(out->Remove(&temp)){
+		if(0 == tempP.Append(&temp)){ //If the append fails
+			f.AddPage(&temp, globalPageIndex);
+			globalPageIndex++;
+			tempP.EmptyItOut();
+			tempP.Append(&temp);
+		}
+	}//Ended pulling records out of pipe
+	
+	return;
+	
+/*
 	//cout << "Have shut down in. In WriteToFile." << endl;
 	cout << "File path is: "<< filePath << endl;
 	//The idea here is that we have a bunch of records in the output pipe. We need to merge these in with our file.
@@ -401,6 +432,7 @@ void SortedDB::WriteToFile(){
 		tempF.Close();
 		rename("temptemptemp.bin", filePath.c_str());
 	} //End initial if/else statement
+ */
 }
 
 void SortedDB::resetBQ(){
