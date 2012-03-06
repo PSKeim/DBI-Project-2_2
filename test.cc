@@ -12,10 +12,11 @@ int add_data (FILE *src, int numrecs, int &res) {
 
 	int proc = 0;
 	int xx = 20000;
-	while ((++proc < numrecs) && (res = temp.SuckNextRecord (rel->schema (), src))) {
+	while ((proc < numrecs) && (res = temp.SuckNextRecord (rel->schema (), src))) {
 		dbfile.Add (temp);
 		if (proc == xx) cerr << "\t ";
 		if (proc % xx == 0) cerr << ".";
+		proc++;
 	}
 
 	dbfile.Close ();

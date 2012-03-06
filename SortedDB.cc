@@ -278,7 +278,7 @@ void SortedDB::WriteToFile(){
 	Page holderP;
 	Page tempWriteoutP;
 	//If the file is empty, we have an easy case. We just remove the records from the pipe, and page them in as necessary.
-//	cout << "Checking that the file is empty" << endl;
+	//	cout << "Checking that the file is empty" << endl;
 	if(f.GetLength() <= 0){
 		//cout << "File is empty." << endl;
 
@@ -296,6 +296,7 @@ void SortedDB::WriteToFile(){
 		//cout << "File added page at index" << globalPageIndex << endl;
 		globalPageIndex++;
 	}
+	
 	else{
 		cout << "File is not empty." << endl;
 		//Assuming the file is not empty, we have to decide what the best way to do it is
@@ -328,10 +329,10 @@ void SortedDB::WriteToFile(){
 				//We are out of items from the pipe. That means merge is finished, and we need to pump out the rest of the items from
 				//the actual file to the temp file.
 				do{
-					if(0 == tempWriteoutP.Append(&readIn)){
+					if(0 == tempWriteoutP.Append(&pageIn)){
 						tempF.AddPage(&tempWriteoutP, tempIndex);
 						tempIndex++;
-				 		tempWriteoutP.Append(&readIn);
+				 		tempWriteoutP.Append(&pageIn);
 					}
 					
 					if(0 == holderP.GetFirst(&pageIn) && globalPageIndex < f.GetLength()-1){
