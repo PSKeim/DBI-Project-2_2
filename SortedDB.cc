@@ -272,6 +272,7 @@ void SortedDB::WriteToFile(){
 	 **/
 	Record temp;
 	int pFF = 0;
+	int added = 0;
 	//MoveFirst(); //Gotta start at the beginning.
 	if (f.GetLength() > 0) {
 		while (GetNext(temp))
@@ -280,15 +281,18 @@ void SortedDB::WriteToFile(){
 			pFF++;
         }
     }//At the end of this, all the records that were in the file are now in the in pipe
-	cout << "Pulled " << pFF << " records from file int othe pipe" << endl;
+	cout << "Pulled " << pFF << " records from file into the pipe" << endl;
 	in->ShutDown();
 	cout << "Input pipe has shut down." << endl;
 	f.Close();
 	f.Open(0,(char *)filePath.c_str());
 	int tempIndex = 0;
 	Page tempP;
+	
 	while(out->Remove(&temp)){
+		added++;
 		if(0 == tempP.Append(&temp)){ //If the append fails
+			cout << "Adding a page in WTF" << endl;
 			f.AddPage(&tempP, tempIndex);
 			tempIndex++;
 			tempP.EmptyItOut();
@@ -298,6 +302,7 @@ void SortedDB::WriteToFile(){
 	f.AddPage(&tempP, tempIndex);
 	tempIndex++;
 	
+	cout << "Pulled "<< added << " records from pipe" << endl;
 	MoveFirst();
 	
 	return;
