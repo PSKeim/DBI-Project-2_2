@@ -118,6 +118,7 @@ int SortedDB::Open (char *fpath){
 }
 
 int SortedDB::Close(){
+	SetWriting(false);
 	f.Close();	//Metadata being written out is handled by the Create operator. Close just shuts down the shop.
 	return 1;
 }
