@@ -154,9 +154,9 @@ void SortedDB::Load(Schema &myschema, char *loadpath){
 void SortedDB::Add(Record &rec){
 
 	SetWriting(true); //Again, writing stuff to file.
-	
+
 	in->Insert(&rec);
-		
+	cout << "Inserted record into pipe" << endl;	
 	return;
 }	
 
@@ -249,6 +249,7 @@ void SortedDB::SetWriting(bool newMode, bool isCNF){
 	if(isWriting){
 		//Switching to Reading phase
 		//This writes everything out to the file, and GTFO's
+		cout << "DBFile is now prepared to read." << endl;
 		isWriting = false;
 		WriteToFile();
 		MoveFirst(); //Basically, I'm saying that if you want to read after adding/loading, you start from the beginning.
@@ -256,6 +257,7 @@ void SortedDB::SetWriting(bool newMode, bool isCNF){
 	}
 	else{
 		//If isWriting isn't true, then we're READING, so we need to switch to Writing
+		cout << "DBFile is now prepared to write." << endl;
 		isWriting = true;
 		//Switching from Reading to Writing requires that we reset our BigQ.
 		resetBQ();
