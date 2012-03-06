@@ -272,9 +272,8 @@ void SortedDB::WriteToFile(){
 	 **/
 	Record temp;
 	MoveFirst(); //Gotta start at the beginning.
-	
-	if (0 != f.GetLength()) // file was new, so don't bother merging, just write from pipe to file.
-    {
+	if (0 != f.GetLength()) {
+		cout << "File's length was 0... why am I in here for this test??? " << endl;
 		while (GetNext(temp))
         {
 			in->Insert(&temp);
@@ -284,7 +283,7 @@ void SortedDB::WriteToFile(){
 	in->ShutDown();
 	
 	f.Close();
-	f.Open(0,filePath.c_str());
+	f.Open(0,(char *)filePath.c_str());
 	int tempIndex = 0;
 	Page tempP;
 	while(out->Remove(&temp)){
