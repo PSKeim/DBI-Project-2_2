@@ -156,7 +156,7 @@ void SortedDB::Add(Record &rec){
 	SetWriting(true); //Again, writing stuff to file.
 
 	in->Insert(&rec);
-	cout << "Inserted record into pipe" << endl;	
+	//cout << "Inserted record into pipe" << endl;	
 	return;
 }	
 
@@ -170,14 +170,14 @@ int SortedDB::GetNext(Record &fetch){
 			p.GetFirst(&fetch);
 			return 1;
 		}
-		cout << "Nothing left in the file!" << endl;
+	//	cout << "Nothing left in the file!" << endl;
 		return 0;//No records left
 	}
 	return 1; 
 }
 
 int SortedDB::GetNext(Record &fetchme, CNF &cnf, Record &literal){
-	cout << "In GetNext CNF for test." << endl;
+//	cout << "In GetNext CNF for test." << endl;
 	SetWriting(false, true); //The one query where we WANT To tell SetWriting that it's a CNF
 	//This is because if we run multiple GNCNF queries, we don't want to have to re-do all the work
 	//Because, you know, it's a lot of work and stuff.
@@ -187,16 +187,16 @@ int SortedDB::GetNext(Record &fetchme, CNF &cnf, Record &literal){
 	ComparisonEngine comp;
 	
 	int ret = GetNext(fetchme);
-	cout << "Got past the initial ret" << endl;
+	//cout << "Got past the initial ret" << endl;
 	if(ret == 0){ 
 		return 0; //Nothing in the file, so nothing to do here!
 	}	
 	while(!comp.Compare (&fetchme, &literal, &cnf)){
-		cout << "Comparing records!" << endl;
+	//	cout << "Comparing records!" << endl;
 		ret = GetNext(fetchme);
 		
 		if(ret == 0){ 
-			cout << "Nothing found, time to leave. " << endl;
+			//cout << "Nothing found, time to leave. " << endl;
 			return 0; //Nothing in the file, so nothing to do here!
 		}	
 		/*if(p.GetFirst(&fetchme) == 0){
@@ -249,7 +249,7 @@ void SortedDB::SetWriting(bool newMode, bool isCNF){
 	if(isWriting){
 		//Switching to Reading phase
 		//This writes everything out to the file, and GTFO's
-		cout << "DBFile is now prepared to read." << endl;
+		//cout << "DBFile is now prepared to read." << endl;
 		isWriting = false;
 		WriteToFile();
 		MoveFirst(); //Basically, I'm saying that if you want to read after adding/loading, you start from the beginning.
@@ -257,7 +257,7 @@ void SortedDB::SetWriting(bool newMode, bool isCNF){
 	}
 	else{
 		//If isWriting isn't true, then we're READING, so we need to switch to Writing
-		cout << "DBFile is now prepared to write." << endl;
+		//cout << "DBFile is now prepared to write." << endl;
 		isWriting = true;
 		//Switching from Reading to Writing requires that we reset our BigQ.
 		resetBQ();
