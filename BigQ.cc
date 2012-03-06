@@ -26,7 +26,7 @@ BigQ :: BigQ (Pipe &in, Pipe &out, OrderMaker &sortorder, int runlen):order(sort
 	this->output = &out;
 	//this->order = sortorder;
 	this->runlen = runlen;
-	char* tmpFile = "/tmp/felixfaureDBITemp";
+	char* tmpFile = "/tmp/DBI/felixfaureDBITemp";
 	f.Open(0,tmpFile);
 	//And start working on the thread
 	pthread_create (&worker, NULL, WorkThread, (void *)this);
